@@ -33,18 +33,13 @@ if user:
 
 """
 
-import urllib
 import hashlib
 import hmac
 import base64
 import requests
 import json
 
-# Find a query string parser
-try:
-    from urllib.parse import parse_qs
-except ImportError:
-    from urlparse import parse_qs
+from urllib.parse import parse_qs, urlencode
 
 from . import version
 
@@ -182,8 +177,7 @@ class GraphAPI(object):
                      files={"file": image},
                      method="POST")
 
-    def request(
-            self, path, args=None, post_args=None, files=None, method=None):
+    def request(self, path, args=None, post_args=None, files=None, method=None):
         """Fetches the given path in the Graph API.
 
         We translate args to a valid query string. If post_args is
@@ -279,7 +273,7 @@ class GraphAPI(object):
             "fb_exchange_token": self.access_token,
         }
 
-        return self.request("access_token", args=args)
+        return self.request("oauth/access_token", args=args)
 
 
 class GraphAPIError(Exception):
@@ -388,7 +382,7 @@ def auth_url(app_id, canvas_url, perms=None, **kwargs):
     if perms:
         kvps['scope'] = ",".join(perms)
     kvps.update(kwargs)
-    return url + urllib.urlencode(kvps)
+    return url + urlencode(kvps)
 
 
 def get_access_token_from_code(code, redirect_uri, app_id, app_secret):
